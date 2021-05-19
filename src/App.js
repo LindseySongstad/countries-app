@@ -1,25 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import countries from "./CountriesAPI";
+import Country from "./Country";
+function CountriesComponent() {
+  const [data, setData] = useState([]);
+  const [searchName, setSearchName] = useState("");
 
-function App() {
+  useEffect(() => {
+    countries.getCountries().then((response) => {
+      setData(response.data);
+    });
+  }, []);
+
+  const filteredData =
+    searchName.length === 0
+      ? data
+      : data.filter((country) =>
+          country.name.toLowerCase().includes(searchName.toLowerCase())
+        );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="search-container">
+        <h1>Country Facts</h1>
+        <span className="search">Search </span>
+        <input
+          className="input"
+          type="text"
+          placeholder="Country Name"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+        />
+      </div>
+
+      <div className="flex-container">
+        {filteredData.map((item, index) => {
+          return (
+            <Country
+              key={index}
+              name={item.name}
+              capital={item.capital}
+              population={item.population}
+              flag={item.flag}
+              language={item.languages[0].name}
+              currency={item.currencies[0].name}
+              area={item.area}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-export default App;
+export default CountriesComponent;
